@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO Meta Tags -->
+    <title>Conscious Cards - Daily Prompts for Mindful Living</title>
+    <meta
+      name="description"
+      content="Draw your daily card for conscious living. 70 mindfulness prompts with journal questions and actionable steps to deepen self-awareness and intentional living."
+    />
+    <meta
+      name="keywords"
+      content="mindfulness, journaling, conscious living, daily prompts, self-awareness, personal growth"
+    />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Conscious Cards - Daily Prompts for Mindful Living"
+    />
+    <meta
+      property="og:description"
+      content="Draw your daily card for conscious living. 70 mindfulness prompts with journal questions and actionable steps."
+    />
+    <meta property="og:image" content="images/logo.png" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#64D9C3" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/logo.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header" role="banner">
+      <div class="header-content">
+        <img
+          src="images/logo.png"
+          alt="Conscious Cards Logo"
+          class="header-logo"
+        />
+        <nav class="navigation">
+          <a href="index.html" class="nav-link active">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="store.html" class="nav-link">Store</a>
+          <a href="journeys.html" class="nav-link">Journeys</a>
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            aria-label="Toggle dark mode"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Content with Sidebar -->
+    <main role="main" class="main-with-sidebar">
+      <!-- Main Content -->
+      <div class="card-container">
+        <!-- Card -->
+        <div class="card" id="current-card">
+          <div class="card-inner">
+            <!-- Front of Card -->
+            <div class="card-front">
+              <!-- Branding -->
+              <div class="card-branding">Conscious Cards</div>
+
+              <!-- Favorite Button -->
+              <button
+                id="favorite-button"
+                class="favorite-button"
+                aria-label="Add to favorites"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  ></path>
+                </svg>
+              </button>
+
+              <!-- Card Content -->
+              <div class="card-content">
+                <!-- Concept Title -->
+                <h1 id="card-concept" class="card-title"></h1>
+
+                <!-- Illustration -->
+                <div id="card-illustration" class="card-illustration">
+                  <!-- Stick figure illustration will be inserted here -->
+                </div>
+
+                <!-- Show Prompt Button -->
+                <button id="show-prompt-btn" class="action-button primary">
+                  Reveal Journal Prompt ✨
+                </button>
+
+                <!-- Journal Prompt Section (Hidden Initially) -->
+                <div id="prompt-section" class="card-section">
+                  <p class="card-label">Journal Prompt</p>
+                  <p id="card-prompt" class="card-text"></p>
+
+                  <!-- Audio Player (if available) -->
+                  <div id="audio-container" class="audio-container hidden">
+                    <audio id="card-audio" controls></audio>
+                  </div>
+
+                  <!-- Show Actions Button -->
+                  <button
+                    id="show-actions-btn"
+                    class="action-button primary"
+                    style="display: none; margin-top: var(--space-lg)"
+                  >
+                    Show Actions 🎯
+                  </button>
+                </div>
+
+                <!-- Actions Section (Hidden Initially) -->
+                <div id="actions-section" class="card-section">
+                  <p class="card-label">Suggested Actions</p>
+                  <div id="card-actions" class="card-actions">
+                    <!-- Actions will be dynamically inserted -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Flip Button (temporarily commented out)
+              <button
+                id="flip-to-back-button"
+                class="flip-button"
+                aria-label="Flip to back of card"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+              </button>
+              -->
+            </div>
+
+            <!-- Back of Card -->
+            <div class="card-back">
+              <!-- Branding -->
+              <div class="card-branding">Conscious Cards</div>
+
+              <!-- Card Content -->
+              <div class="card-content">
+                <h2 id="card-concept-back" class="card-title"></h2>
+
+                <div class="card-section visible">
+                  <p class="card-label">Reflection Space</p>
+                  <p class="card-text" style="font-style: italic; opacity: 0.8">
+                    Take a moment to reflect on this card's message.
+                    <br /><br />
+                    How does it resonate with your current journey?
+                    <br /><br />
+                    What insights are emerging for you?
+                  </p>
+                </div>
+              </div>
+
+              <!-- Flip Button -->
+              <button
+                id="flip-to-front-button"
+                class="flip-button"
+                aria-label="Flip to front of card"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="1 10 1 4 7 4"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 4"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- Left Side Buttons -->
+        <div class="main-actions left">
+          <button id="share-card-btn" class="action-button secondary">
+            <span class="button-text">📤 Share Card</span>
+          </button>
+        </div>
+
+        <!-- Right Side Buttons -->
+        <div class="main-actions right">
+          <button id="new-card-btn" class="action-button primary">
+            <span class="button-text">🎴 New Card</span>
+          </button>
+        </div>
+      </div>
+
+      </div>
+
+      <!-- Share Modal -->
+      <div id="share-modal" class="share-modal hidden">
+        <div class="share-modal-overlay"></div>
+        <div class="share-modal-content">
+          <button id="close-share-modal" class="close-modal-btn" aria-label="Close share modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <h2 class="share-modal-title">Share This Card</h2>
+          <p class="share-modal-subtitle">Spread mindfulness with others</p>
+          
+          <div class="share-link-container">
+            <input type="text" id="share-link-input" readonly class="share-link-input" />
+            <button id="copy-link-btn" class="copy-link-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy Link
+            </button>
+          </div>
+
+          <div class="share-options">
+            <p class="share-options-label">Or share via:</p>
+            <div class="share-buttons">
+              <button class="share-option-btn" data-share="twitter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                Twitter
+              </button>
+              <button class="share-option-btn" data-share="facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Facebook
+              </button>
+              <button class="share-option-btn" data-share="email">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Email
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="scripts/main.js"></script>
+
+    <!-- Additional Styles for Dynamic Elements -->
+    <style>
+      .action-text {
+        flex: 1;
+        line-height: 1.6;
+        color: var(--color-text);
+      }
+
+      .action-icon {
+        margin-right: var(--space-xs);
+        font-size: 1.2rem;
+      }
+
+      .audio-container {
+        width: 100%;
+        margin-top: var(--space-md);
+      }
+
+      .audio-container audio {
+        width: 100%;
+        border-radius: var(--radius-md);
+      }
+
+      .tomorrow-preview {
+        animation: fadeInUp 1s ease 2s both;
+      }
+
+      /* Toast Message Animation */
+      @keyframes slideUp {
+        from {
+          transform: translate(-50%, 100px);
+          opacity: 0;
+        }
+        to {
+          transform: translate(-50%, 0);
+          opacity: 1;
+        }
+      }
+    </style>
+  </body>
+</html>

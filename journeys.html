@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO Meta Tags -->
+    <title>Conscious Cards - Journaling Journeys</title>
+    <meta
+      name="description"
+      content="Explore curated journaling journeys based on themes like Gratitude, Resilience, and Self-Compassion. Find prompts tailored to your personal growth path."
+    />
+    <meta
+      name="keywords"
+      content="journaling, themes, journeys, mindfulness, personal growth, self-awareness, curated prompts, conscious living"
+    />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Conscious Cards - Journaling Journeys"
+    />
+    <meta
+      property="og:description"
+      content="Explore curated journaling journeys based on themes like Gratitude, Resilience, and Self-Compassion."
+    />
+    <meta property="og:image" content="images/logo.png" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#64D9C3" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/logo.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles/main.css" />
+    <style>
+      /* Hero Section */
+      .journey-hero {
+        background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary-dark));
+        color: white;
+        padding: var(--space-xxl) var(--space-lg);
+        border-radius: 0 0 32px 32px;
+        margin-bottom: var(--space-xxl);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .journey-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('public/images/journey_Image.png') no-repeat right -100px center/cover;
+        opacity: 0.1;
+        z-index: 0;
+      }
+
+      .journey-hero-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+
+      .journey-hero h1 {
+        font-size: 2.8rem;
+        margin-bottom: var(--space-md);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      .journey-hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto var(--space-lg);
+        opacity: 0.95;
+      }
+
+      .view-toggle-container {
+        display: flex;
+        justify-content: center;
+        margin-top: var(--space-lg);
+      }
+
+      /* Journeys Container */
+      .journeys-container {
+        max-width: 1200px;
+        margin: 0 auto var(--space-xxl);
+        padding: 0 var(--space-md);
+      }
+
+      @media (max-width: 1024px) {
+        .theme-grid {
+          grid-template-columns: repeat(6, 1fr);
+        }
+        .theme-card {
+          grid-column: span 3 !important;
+          grid-row: span 1 !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .journey-hero {
+          padding: var(--space-xl) var(--space-md);
+          border-radius: 0 0 24px 24px;
+        }
+
+        .journey-hero h1 {
+          font-size: 2rem;
+        }
+
+        .journey-hero p {
+          font-size: 1.1rem;
+        }
+
+        .journeys-container {
+          padding: 0 var(--space-md);
+        }
+
+        .theme-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        
+        .theme-card {
+          grid-column: span 1 !important;
+          grid-row: span 1 !important;
+          aspect-ratio: 1/1;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .theme-grid {
+          grid-template-columns: 1fr;
+        }
+        .theme-card {
+          grid-column: span 1 !important;
+          grid-row: span 1 !important;
+        }
+      }
+
+      .journeys-header {
+        text-align: center;
+        margin-bottom: var(--space-xl);
+      }
+
+      .journeys-title {
+        font-family: var(--font-fraunces);
+        font-size: 3rem;
+        color: var(--color-heading);
+        margin-bottom: var(--space-sm);
+      }
+
+      .journeys-subtitle {
+        font-size: 1.2rem;
+        color: var(--color-text-secondary);
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-auto-rows: minmax(180px, auto);
+        gap: var(--space-md);
+        margin: var(--space-xl) 0;
+      }
+
+      .theme-card {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        background-size: cover;
+        background-position: center;
+        background-blend-mode: overlay;
+        background-color: rgba(0, 0, 0, 0.3);
+        color: white;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        aspect-ratio: 1/1;
+        transform: translateY(0);
+        will-change: transform, box-shadow;
+      }
+
+      .theme-card.featured-theme {
+        grid-column: 1 / -1 !important;
+        min-height: 400px;
+        aspect-ratio: 2.5/1;
+      }
+
+      .theme-card.featured-theme .theme-card-content {
+        max-width: 70%;
+      }
+
+      .theme-card-badge {
+        position: absolute;
+        top: var(--space-md);
+        right: var(--space-md);
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* Random background patterns for each card */
+      .theme-card:nth-child(6n+1) { background-image: linear-gradient(135deg, #8e44ad, #3498db); }
+      .theme-card:nth-child(6n+2) { background-image: linear-gradient(135deg, #e74c3c, #f39c12); }
+      .theme-card:nth-child(6n+3) { background-image: linear-gradient(135deg, #1abc9c, #2ecc71); }
+      .theme-card:nth-child(6n+4) { background-image: linear-gradient(135deg, #9b59b6, #e74c3c); }
+      .theme-card:nth-child(6n+5) { background-image: linear-gradient(135deg, #3498db, #9b59b6); }
+      .theme-card:nth-child(6n+6) { background-image: linear-gradient(135deg, #f1c40f, #e67e22); }
+
+      /* Card sizes and positions in the mosaic */
+      .theme-card:nth-child(12n+1) { grid-column: span 6; grid-row: span 2; }
+      .theme-card:nth-child(12n+2) { grid-column: span 6; grid-row: span 1; }
+      .theme-card:nth-child(12n+3) { grid-column: span 4; grid-row: span 1; }
+      .theme-card:nth-child(12n+4) { grid-column: span 4; grid-row: span 1; }
+      .theme-card:nth-child(12n+5) { grid-column: span 4; grid-row: span 2; }
+      .theme-card:nth-child(12n+6) { grid-column: span 6; grid-row: span 1; }
+      .theme-card:nth-child(12n+7) { grid-column: span 6; grid-row: span 2; }
+      .theme-card:nth-child(12n+8) { grid-column: span 3; grid-row: span 1; }
+      .theme-card:nth-child(12n+9) { grid-column: span 3; grid-row: span 1; }
+      .theme-card:nth-child(12n+10) { grid-column: span 3; grid-row: span 1; }
+      .theme-card:nth-child(12n+11) { grid-column: span 3; grid-row: span 1; }
+      .theme-card:nth-child(12n+12) { grid-column: span 4; grid-row: span 2; }
+
+      .theme-card-content {
+        position: relative;
+        z-index: 2;
+        padding: var(--space-lg);
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        margin-top: auto;
+        transition: transform 0.3s ease;
+      }
+
+      .theme-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: var(--space-sm);
+      }
+
+      .theme-card-count {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .theme-card-count::before {
+        content: '📋';
+        font-size: 1em;
+      }
+
+      .theme-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+      }
+
+      .theme-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+      }
+
+      .theme-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .theme-card-title {
+        font-family: var(--font-fraunces);
+        font-size: 1.8rem;
+        color: white;
+        margin: 0 0 var(--space-xs);
+        line-height: 1.2;
+      }
+
+      .theme-card-description {
+        font-size: 0.95rem;
+        color: rgba(255,255,255,0.9);
+        margin: 0 0 var(--space-sm);
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-clamp: 3;
+        text-overflow: ellipsis;
+        line-height: 1.5;
+      }
+
+      .featured-theme .theme-card-description {
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        font-size: 1.1rem;
+        margin-bottom: var(--space-md);
+      }
+
+      .theme-card-button {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(5px);
+        font-size: 0.9rem;
+        min-width: 100px;
+      }
+
+      .theme-card-button:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateY(-1px);
+      }
+
+      .theme-card-button:active {
+        transform: translateY(0);
+      }
+
+      .theme-card-button::after {
+        content: '→';
+        margin-left: 8px;
+        transform: translateX(-5px);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      .theme-card-button:hover::after {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      .theme-card-button:hover {
+        background-color: var(--color-primary-dark);
+      }
+
+      /* Add styles for the selected journey page if needed */
+      .journey-detail {
+        max-width: 900px;
+        margin: var(--space-xl) auto;
+        padding: var(--space-lg);
+        background-color: var(--color-card-background);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+      }
+
+      .journey-title {
+        font-family: var(--font-fraunces);
+        font-size: 2.5rem;
+        color: var(--color-heading);
+        margin-bottom: var(--space-md);
+        text-align: center;
+      }
+
+      .journey-description {
+        font-size: 1.1rem;
+        color: var(--color-text-secondary);
+        text-align: center;
+        margin-bottom: var(--space-lg);
+      }
+
+      .journey-card-list {
+        margin-top: var(--space-lg);
+      }
+
+      .journey-card-item {
+        background: var(--color-bg);
+        border-radius: 12px;
+        padding: var(--space-lg);
+        margin-bottom: var(--space-md);
+        transition: all 0.3s ease;
+        border: 1px solid var(--color-border);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .journey-card-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--color-primary);
+        transform: scaleY(0);
+        transform-origin: top;
+        transition: transform 0.4s ease;
+      }
+
+      .journey-card-item:hover::before {
+        transform: scaleY(1);
+      }
+
+      .journey-card-item h3 {
+        font-family: var(--font-fraunces);
+        font-size: 1.4rem;
+        color: var(--color-heading);
+        margin-bottom: var(--space-sm);
+      }
+      .journey-card-item p {
+        font-size: 0.95rem;
+        color: var(--color-text-secondary);
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header (will be injected by JS or duplicated) -->
+    <header class="header" role="banner">
+      <div class="header-content">
+        <img
+          src="images/logo.png"
+          alt="Conscious Cards Logo"
+          class="header-logo"
+        />
+        <nav class="navigation">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="store.html" class="nav-link">Store</a>
+          <a href="journeys.html" class="nav-link active">Journeys</a>
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            aria-label="Toggle dark mode"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main role="main">
+      <!-- Hero Section with Journey Image -->
+      <div class="journey-hero">
+        <div class="journey-hero-content">
+          <h1 class="journeys-title">Your Journaling Journey Awaits</h1>
+          <p class="journeys-subtitle">
+            Embark on a path of self-discovery with our curated themes. Each journey offers daily prompts to guide your reflection and growth.
+          </p>
+          <div class="view-toggle-container">
+            <button id="view-toggle" class="action-button secondary" aria-pressed="false">
+              <span class="button-icon">🌐</span> Switch to Word Cloud
+            </button>
+          </div>
+        </div>
+        <div class="journey-hero-image">
+          <img src="public/images/journey_Image.png" alt="Journey illustration" loading="lazy">
+        </div>
+      </div>
+
+      <div class="journeys-container">
+        <div class="journeys-header">
+          <h2 class="section-title">Choose Your Path</h2>
+          <p class="section-subtitle">
+            Select a theme to begin your journey. New cards will be revealed each day.
+          </p>
+        </div>
+
+        <div id="theme-grid" class="theme-grid">
+          <!-- Theme cards will be dynamically loaded here -->
+          <p>Loading themes...</p>
+        </div>
+
+        <div id="word-cloud-container" class="word-cloud hidden" aria-label="Theme word cloud"></div>
+
+        <!-- Section for displaying selected journey/cards (initially hidden) -->
+        <div id="journey-detail-section" class="journey-detail hidden">
+          <h2 id="journey-theme-title" class="journey-title"></h2>
+          <p id="journey-theme-description" class="journey-description"></p>
+          <div id="journey-card-list" class="journey-card-list">
+            <!-- Cards for the selected theme will be listed here -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- JavaScript -->
+    <!-- We'll need a new script for this page, or modify main.js to handle multiple pages -->
+    <script src="scripts/journeys.js"></script> 
+    <!-- Temporary - need to ensure theme-toggle works here -->
+    <script>
+      // Basic theme toggle logic for this page (can be refactored into a shared script later)
+      const themeToggle = document.getElementById("theme-toggle");
+      if (themeToggle) {
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        themeToggle.addEventListener("click", () => {
+          const currentTheme = document.documentElement.getAttribute("data-theme");
+          const newTheme = currentTheme === "light" ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", newTheme);
+          localStorage.setItem("theme", newTheme);
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,628 @@
+// Main application initialization function
+const initApp = () => {
+    console.log('Initializing Conscious Cards app...');
+    
+    try {
+    // Select elements to display the card content
+    const currentCard = document.getElementById('current-card');
+    const cardConcept = document.getElementById('card-concept');         // Concept on front
+    const cardPrompt = document.getElementById('card-prompt');           // Prompt on front
+    const cardConceptBack = document.getElementById('card-concept-back'); // Concept on back
+    const cardActions = document.getElementById('card-actions');         // Actions on back
+
+    const newCardBtn = document.getElementById('new-card-btn');
+    const shareCardBtn = document.getElementById('share-card-btn');      // Changed from copyCardBtn
+    const copyMessage = document.getElementById('copy-message');         // Repurposed for email feedback
+    const journalEntry = document.getElementById('journal-entry');
+    const saveEntryBtn = document.getElementById('save-entry-btn');
+    const viewEntriesBtn = document.getElementById('view-entries-btn');
+    const pastEntriesContainer = document.getElementById('past-entries-container');
+    const pastEntriesList = document.getElementById('past-entries-list');
+    const closeEntriesBtn = document.getElementById('close-entries-btn');
+
+    // Select the content containers for the front and back of the card to manage animations
+    const cardFrontContentDiv = currentCard.querySelector('.card-front-content');
+    const cardFrontTitle = currentCard.querySelector('.card-title'); // Concept title on front
+    const cardFrontLabel = currentCard.querySelector('.card-label');
+    const cardFrontText = currentCard.querySelector('#card-prompt');
+
+    // Elements for card flipping
+    const cardInner = currentCard.querySelector('.card-inner');
+    const cardFrontDiv = currentCard.querySelector('.card-front'); // Reference to the actual front face div
+    const cardBackDiv = currentCard.querySelector('.card-back');   // Reference to the actual back face div
+    const flipToBackButton = document.getElementById('flip-to-back-button');
+    const flipToFrontButton = document.getElementById('flip-to-front-button');
+
+    let journalData = [];
+
+    let currentCardIndex = 0; // Initialize current card index
+
+    // Add scroll event listener for header effect
+    window.addEventListener('scroll', function() {
+        const header = document.querySelector('.header');
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+    // Function to get a random color for cards
+    function getRandomColor() {
+        const colors = ["#64D9C3", "#A8DADC", "#E0BBE4", "#90EE90", "#FDD49E", "#FFD700", "#C1E1C1", "#FFB6C1", "#87CEFA"];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    async function loadCardData() {
+        console.log('Loading card data...');
+        
+        // Check if required elements exist (already defined at the top)
+        if (!cardConcept || !cardPrompt || !cardConceptBack || !cardActions) {
+            console.error("Required DOM elements not found");
+            return;
+        }
+        // Get DOM elements
+        const cardConcept = document.getElementById('card-concept');
+        const cardPrompt = document.getElementById('card-prompt');
+        const cardConceptBack = document.getElementById('card-concept-back');
+        const cardActions = document.getElementById('card-actions');
+        
+        if (!cardConcept || !cardPrompt || !cardConceptBack || !cardActions) {
+            console.error("Required DOM elements not found");
+            return;
+        }
+        try {
+            // Try to load from cards.json
+            const response = await fetch('cards.json');
+            if (!response.ok) {
+                throw new Error('Failed to load cards.json');
+            }
+            journalData = await response.json();
+            
+            // Ensure we have valid data
+            if (!Array.isArray(journalData) || journalData.length === 0) {
+                throw new Error('No valid card data found');
+            }
+            
+            // Process the cards to ensure they have all required fields
+            journalData = journalData.map(card => ({
+                ...card,
+                color: card.color || getRandomColor()
+            }));
+            
+            // Check for URL parameter to load a specific card
+            const urlParams = new URLSearchParams(window.location.search);
+            const cardConceptFromUrl = urlParams.get('card');
+
+            if (cardConceptFromUrl) {
+                const specificCard = journalData.find(card => 
+                    card.Concept && card.Concept.toLowerCase() === cardConceptFromUrl.toLowerCase()
+                );
+                if (specificCard) {
+                    displaySpecificCard(specificCard);
+                    return;
+                }
+            }
+            
+            // If no specific card requested, show a random one
+            displayRandomCard();
+            
+        } catch (error) {
+            console.error("Error loading card data:", error);
+            // Show error message to user
+            cardConcept.textContent = "Error";
+            cardPrompt.textContent = "Couldn't load cards. Please try refreshing the page.";
+        }
+    }
+
+    function displaySpecificCard(card) {
+        currentCard.classList.remove('flipped');
+        cardFrontTitle.classList.remove('text-fade-in');
+        cardFrontContentDiv.classList.remove('text-fade-in');
+        currentCard.classList.add('fade-out');
+
+        setTimeout(() => {
+            // Set front content
+            cardConcept.textContent = card.Concept;
+            cardPrompt.textContent = card["Journal Prompt"];
+            
+            // Set back content
+            cardConceptBack.textContent = card.Concept;
+            
+            // Clear previous actions
+            cardActions.innerHTML = '';
+            
+            // Add action items
+            if (card["Action 1"]) {
+                const action1 = document.createElement('div');
+                action1.className = 'action-item';
+                action1.textContent = card["Action 1"];
+                cardActions.appendChild(action1);
+            }
+            
+            if (card["Action 2"]) {
+                const action2 = document.createElement('div');
+                action2.className = 'action-item';
+                action2.textContent = card["Action 2"];
+                cardActions.appendChild(action2);
+            }
+
+            currentCard.classList.remove('fade-out');
+            currentCard.classList.add('fade-in');
+            setCardHeight();
+
+            setTimeout(() => {
+                cardFrontTitle.classList.add('text-fade-in');
+                cardFrontContentDiv.classList.add('text-fade-in');
+            }, 100);
+
+            currentCard.addEventListener('animationend', (event) => {
+                if (event.animationName === 'fade-in') {
+                    currentCard.classList.remove('fade-in');
+                }
+            }, { once: true });
+
+            // Update URL for sharing
+            const newUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(card.Concept)}`;
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+
+        }, 500);
+    }
+    
+    // Colors for the random card backgrounds
+    const cardColors = [
+        { primary: '#64D9C3', secondary: '#4AA094' }, // Teal
+        { primary: '#A8DADC', secondary: '#6DBCB6' }, // Light Blue/Green
+        { primary: '#E0BBE4', secondary: '#957DAD' }, // Lavender
+        { primary: '#90EE90', secondary: '#6B8E23' }, // Light Green
+        { primary: '#FDD49E', secondary: '#F0B27A' }, // Peach/Orange
+        { primary: '#ADD8E6', secondary: '#87CEEB' }, // Light Sky Blue
+        { primary: '#FFD700', secondary: '#DAA520' }, // Gold
+        { primary: '#C1E1C1', secondary: '#A0D4A0' }, // Pastel Green
+        { primary: '#FFB6C1', secondary: '#F08080' }, // Light Coral
+        { primary: '#87CEFA', secondary: '#6A5ACD' }  // Light Steel Blue
+    ];
+
+    // Helper to determine if a color is light or dark for dynamic text color
+    function isColorLight(hexColor) {
+        const r = parseInt(hexColor.substring(1, 3), 16);
+        const g = parseInt(hexColor.substring(3, 5), 16);
+        const b = parseInt(hexColor.substring(5, 7), 16);
+        // Perceived brightness calculation
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 180; // Threshold can be adjusted
+    }
+
+    /**
+     * Helper function to get a slightly darker or lighter version of a color for gradients.
+     * This is a simplified function and might not work perfectly for all colors,
+     * but it provides a decent gradient effect.
+     * @param {string} hex - The hex color string (e.g., "#RRGGBB")
+     * @param {number} percent - The percentage to darken/lighten (e.g., -10 for 10% darker)
+     * @returns {string} The new hex color string.
+     */
+    function adjustColorBrightness(hex, percent) {
+        let f = parseInt(hex.slice(1), 16),
+            t = percent < 0 ? 0 : 255,
+            p = percent < 0 ? percent * -1 : percent,
+            R = f >> 16,
+            G = (f >> 8) & 0x00ff,
+            B = f & 0x0000ff;
+        return (
+            "#" +
+            (
+                0x1000000 +
+                (Math.round((t - R) * p) + R) * 0x10000 +
+                (Math.round((t - G) * p) + G) * 0x100 +
+                (Math.round((t - B) * p) + B)
+            )
+            .toString(16)
+            .slice(1)
+        );
+    }
+
+    /**
+     * Dynamically sets the height of the card-inner based on the content of its tallest side.
+     * This ensures no text overflow occurs, even with varying content lengths.
+     */
+    function setCardHeight() {
+        // Temporarily reset display to allow scrollHeight to be accurate
+        cardInner.style.height = 'auto';
+        cardInner.style.minHeight = '0'; // Temporarily unset min-height from CSS for accurate measurement
+
+        // Temporarily set faces to static positioning to measure natural height
+        cardFrontDiv.style.position = 'static';
+        cardBackDiv.style.position = 'static';
+
+        // Measure heights after content has rendered and positioning is static
+        let frontHeight = cardFrontDiv.scrollHeight;
+        let backHeight = cardBackDiv.scrollHeight;
+
+        // Restore absolute positioning
+        cardFrontDiv.style.position = 'absolute';
+        cardBackDiv.style.position = 'absolute';
+
+        // Determine the maximum height needed
+        let maxHeight = Math.max(frontHeight, backHeight);
+
+        // Apply a minimum height to prevent it from being too small on short content
+        const minCardHeight = window.innerWidth <= 480 ? 150 : (window.innerWidth <= 768 ? 180 : 250);
+        maxHeight = Math.max(maxHeight, minCardHeight);
+
+        // Apply the calculated max height to card-inner
+        cardInner.style.height = `${maxHeight}px`;
+        // Also apply the min-height if the calculated height is less than the baseline
+        cardInner.style.minHeight = `${minCardHeight}px`;
+
+        // Log for debugging
+        // console.log(`Front Height: ${frontHeight}px, Back Height: ${backHeight}px, Set Height: ${maxHeight}px`);
+    }
+
+
+    /**
+     * Displays a random card from the journalData array.
+     * Includes a subtle fade-out/fade-in animation for smoother transitions
+     * and text fade-in.
+     */
+    async function displayRandomCard() {
+        // Ensure card is on the front side and not flipped when a new card is loaded
+        currentCard.classList.remove('flipped');
+
+        // Clear any previous text animation classes from the front content
+        cardFrontTitle.classList.remove('text-fade-in');
+        cardFrontContentDiv.classList.remove('text-fade-in');
+
+        // Add fade-out class to current card container
+        currentCard.classList.add('fade-out');
+
+        // After the fade-out, update content and fade in
+        setTimeout(() => {
+            if (journalData.length === 0) {
+                cardConcept.textContent = "No cards available.";
+                cardPrompt.textContent = "Please add data to the journalData array in script.js.";
+                cardActions.textContent = "";
+                cardConceptBack.textContent = ""; // Clear back concept too
+                cardFrontDiv.style.background = '#ccc'; // Set a default background if no data
+                currentCard.classList.remove('fade-out'); // Ensure it's visible if no data
+                setCardHeight(); // Adjust height even for no data state
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * journalData.length);
+            const randomCard = journalData[randomIndex];
+
+            const randomColor = cardColors[Math.floor(Math.random() * cardColors.length)];
+
+            // Apply the random color with a subtle linear gradient to the card-front
+            cardFrontDiv.style.setProperty('background', `linear-gradient(to bottom right, ${randomColor.primary}, ${randomColor.secondary})`, 'important');
+
+            // Set text color dynamically based on primary color brightness
+            const textColor = isColorLight(randomColor.primary) ? '#333' : '#fff';
+            cardFrontTitle.style.color = textColor;
+            cardFrontLabel.style.color = textColor;
+            cardFrontText.style.color = textColor;
+
+            // Ensure branding color matches for the front
+            const cardBrandingFront = currentCard.querySelector('.card-branding:not(.card-branding-back)');
+            if (cardBrandingFront) {
+                cardBrandingFront.style.color = isColorLight(randomColor.primary) ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)';
+                cardBrandingFront.style.textShadow = isColorLight(randomColor.primary) ? 'none' : '0px 0px 4px rgba(0,0,0,0.5)';
+            }
+
+            // Update content for the front of the card
+            cardConcept.textContent = randomCard.Concept;
+            cardPrompt.textContent = randomCard["Journal Prompt"];
+            
+            // Update content for the back of the card
+            cardConceptBack.textContent = randomCard.Concept; // Concept on the back as well
+            let actionsText = "";
+            if (randomCard["Action 1"]) {
+                actionsText += `<div class="action-item"><img src="images/lotus.png" alt="lotus icon" class="action-bullet-icon"> ${randomCard["Action 1"]}</div>`;
+            }
+            if (randomCard["Action 2"]) {
+                if (actionsText !== "") {
+                    // If action 1 exists, add a clear separation with a new line for the div
+                    actionsText += "\n"; 
+                }
+                actionsText += `<div class="action-item"><img src="images/lotus.png" alt="lotus icon" class="action-bullet-icon"> ${randomCard["Action 2"]}</div>`;
+            }
+            cardActions.innerHTML = actionsText; // Use innerHTML because we are inserting HTML now
+
+
+            // Remove fade-out and add fade-in for the card container
+            currentCard.classList.remove('fade-out');
+            currentCard.classList.add('fade-in');
+
+            // After new content is set, adjust height
+            setCardHeight();
+
+            // Add text-fade-in class after a slight delay to allow card animation to start
+            setTimeout(() => {
+                // Apply animation to the card title and the content div on the front
+                cardFrontTitle.classList.add('text-fade-in');
+                cardFrontContentDiv.classList.add('text-fade-in');
+            }, 100); // Small delay before text starts animating
+
+            // Remove fade-in class after card animation to prepare for next fade-out
+            currentCard.addEventListener('animationend', (event) => {
+                if (event.animationName === 'fade-in') { // Ensure it's the card's fade-in animation
+                    currentCard.classList.remove('fade-in');
+                }
+            }, { once: true });
+
+            // Update URL for sharing
+            const newUrl = `${window.location.origin}${window.location.pathname}?card=${encodeURIComponent(randomCard.Concept)}`;
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+
+        }, 500); // Match CSS transition duration for card fade-out (0.5s)
+    }
+
+    /**
+     * Toggles the 'flipped' class on the card to show its back or front.
+     * Recalculates height after flip, as content might become visible that changes height.
+     */
+    function flipCard() {
+        currentCard.classList.toggle('flipped');
+        // Ensure height is correct after flip
+        setTimeout(setCardHeight, 500); // Adjust height after flip animation starts
+    }
+
+    /**
+     * Prepares an email with the card's content and opens the user's email client.
+     */
+    async function copyCardLink() {
+        const currentUrl = window.location.href;
+        try {
+            await navigator.clipboard.writeText(currentUrl);
+            showCopyMessage('Link copied to clipboard!');
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+            showCopyMessage('Failed to copy link.');
+        }
+    }
+
+    // Helper function to show and hide copy message
+    function showCopyMessage(message) {
+        copyMessage.textContent = message;
+        copyMessage.classList.remove('hidden');
+        copyMessage.classList.add('show');
+        setTimeout(() => {
+            copyMessage.classList.remove('show');
+            copyMessage.classList.add('hidden');
+        }, 3000); // Message visible for 3 seconds
+    }
+
+    /**
+     * Generates a single image containing both the front and back of the card, side-by-side.
+     * This function creates a temporary, off-screen representation of the card
+     * to capture both its front and back content simultaneously using html2canvas.
+     *
+     * @param {string} cardId The ID of the main card element (e.g., 'current-card').
+     * @returns {Promise<string>} A Promise that resolves with the Data URI of the combined image.
+     */
+    async function generateCombinedCardImage(cardId) {
+        const originalCard = document.getElementById(cardId);
+        if (!originalCard) {
+            console.error(`Card with ID ${cardId} not found.`);
+            throw new Error(`Card with ID ${cardId} not found.`);
+        }
+
+        // Create a temporary container to hold the elements for rendering
+        const tempRenderContainer = document.createElement('div');
+        tempRenderContainer.style.position = 'absolute'; // Position off-screen
+        tempRenderContainer.style.left = '-9999px';
+        tempRenderContainer.style.top = '-9999px';
+        tempRenderContainer.style.zIndex = '-100'; // Ensure it's behind everything
+        tempRenderContainer.style.padding = '30px'; // Padding around the combined view
+        tempRenderContainer.style.backgroundColor = '#f8f9fa'; // Base background for the combined image
+        tempRenderContainer.style.boxSizing = 'border-box';
+        tempRenderContainer.style.display = 'flex'; // Use flexbox to arrange cloned cards
+        tempRenderContainer.style.gap = '30px'; // Space between front and back
+        tempRenderContainer.style.maxWidth = '1400px'; // Max width for the combined image
+        tempRenderContainer.style.width = 'fit-content'; // Or a fixed large width, e.g., '1400px'
+        document.body.appendChild(tempRenderContainer);
+
+        // Clone the relevant parts: card-front and card-back directly
+        // This simplifies handling the 3D transforms of .card-inner
+        const originalFront = originalCard.querySelector('.card-front');
+        const originalBack = originalCard.querySelector('.card-back');
+
+        const clonedFront = originalFront.cloneNode(true);
+        const clonedBack = originalBack.cloneNode(true);
+
+        // Apply temporary styles to clones to make them visible and arranged side-by-side
+        clonedFront.style.position = 'relative'; // Override absolute positioning
+        clonedFront.style.transform = 'none'; // Remove any previous transforms
+        clonedFront.style.backfaceVisibility = 'visible'; // Ensure content is always visible
+        clonedFront.style.width = '600px'; // Set a fixed width for each card side in the combined image
+        clonedFront.style.height = 'auto'; // Auto height based on content
+        clonedFront.style.minHeight = '400px'; // Ensure a minimum height if content is sparse
+        clonedFront.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.1)'; // Keep original shadow
+        clonedFront.style.margin = '0'; // Remove any external margins
+
+        clonedBack.style.position = 'relative'; // Override absolute positioning
+        clonedBack.style.transform = 'none'; // Remove any previous transforms (like rotateY)
+        clonedBack.style.backfaceVisibility = 'visible'; // Ensure content is always visible
+        clonedBack.style.width = '600px'; // Match front width
+        clonedBack.style.height = 'auto';
+        clonedBack.style.minHeight = '400px'; // Match front min-height
+        clonedBack.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.1)'; // Keep original shadow
+        clonedBack.style.margin = '0';
+
+        // Important: Copy the *computed* dynamic colors from the original elements
+        // This ensures the rendered clones have the correct background and text colors
+        const computedFrontStyle = window.getComputedStyle(originalFront);
+        const computedBackStyle = window.getComputedStyle(originalBack);
+
+        clonedFront.style.background = computedFrontStyle.background;
+        clonedFront.style.color = computedFrontStyle.color;
+        clonedFront.querySelectorAll('.card-title, .card-label, .card-text').forEach(el => {
+            el.style.color = computedFrontStyle.color;
+        });
+        if (clonedFront.querySelector('.card-branding')) {
+            clonedFront.querySelector('.card-branding').style.color = window.getComputedStyle(originalFront.querySelector('.card-branding')).color;
+            clonedFront.querySelector('.card-branding').style.textShadow = window.getComputedStyle(originalFront.querySelector('.card-branding')).textShadow;
+        }
+
+
+        clonedBack.style.background = computedBackStyle.background;
+        clonedBack.style.color = computedBackStyle.color;
+        clonedBack.querySelectorAll('.card-title, .card-label, .card-text').forEach(el => {
+            el.style.color = computedBackStyle.color;
+        });
+        if (clonedBack.querySelector('.card-branding.card-branding-back')) {
+            clonedBack.querySelector('.card-branding.card-branding-back').style.color = window.getComputedStyle(originalBack.querySelector('.card-branding.card-branding-back')).color;
+            clonedBack.querySelector('.card-branding.card-branding-back').style.textShadow = window.getComputedStyle(originalBack.querySelector('.card-branding.card-branding-back')).textShadow;
+        }
+
+        // Append cloned elements to the temporary container
+        tempRenderContainer.appendChild(clonedFront);
+        tempRenderContainer.appendChild(clonedBack);
+
+        try {
+            // Use html2canvas to render the temporary container
+            const canvas = await html2canvas(tempRenderContainer, {
+                scale: 2, // High resolution for better image quality
+                useCORS: true, // Important for images loaded from different origins (like Joyful.png if it were from CDN)
+                logging: false, // Suppress html2canvas logs
+                backgroundColor: null, // Allow the tempContainer's background to be the canvas background
+            });
+
+            // Convert the canvas content into a PNG Data URI
+            const dataUri = canvas.toDataURL('image/png');
+
+            // Log the Data URI to the console
+            console.log('Generated Combined Card Data URI:', dataUri);
+
+            return dataUri; // Return the Data URI
+
+        } catch (error) {
+            console.error("Error generating combined card image:", error);
+            throw error; // Re-throw to propagate the error
+        } finally {
+            // Clean up: remove temporary container from DOM
+            if (document.body.contains(tempRenderContainer)) {
+                document.body.removeChild(tempRenderContainer);
+            }
+        }
+    }
+
+        // Initialize with a small delay to ensure all elements are available
+        setTimeout(() => {
+            try {
+                loadCardData();
+            } catch (error) {
+                console.error("Initialization error:", error);
+                // Fallback to show something to the user
+                if (cardConcept && cardPrompt) {
+                    cardConcept.textContent = "Welcome";
+                    cardPrompt.textContent = "Click 'Get New Card' to begin your reflection.";
+                }
+            }
+        }, 100);
+    } catch (error) {
+        console.error("App initialization failed:", error);
+    }
+};
+
+// Initialize the app when the DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    // DOMContentLoaded has already fired
+    initApp();
+}
+
+// Also initialize on pageshow for back/forward navigation
+window.addEventListener('pageshow', initApp);
+
+/**
+ * Saves the current journal entry to localStorage.
+ */
+function saveJournalEntry() {
+    const entryText = journalEntry.value.trim();
+    if (entryText === "") {
+        alert("Please write something in your journal before saving.");
+        return;
+    }
+
+    const entry = {
+        concept: cardConcept.textContent,
+        prompt: cardPrompt.textContent,
+        text: entryText,
+        date: new Date().toISOString()
+    };
+
+    let entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+    entries.push(entry);
+        localStorage.setItem('journalEntries', JSON.stringify(entries));
+
+    journalEntry.value = "";
+    alert("Your journal entry has been saved!");
+}
+
+// Event listener for the "New Card" button
+newCardBtn.addEventListener('click', displayRandomCard);
+
+// Event listener for the "Share with a friend" button
+shareCardBtn.addEventListener('click', copyCardLink);
+
+// Event listener for the "Save Entry" button
+saveEntryBtn.addEventListener('click', saveJournalEntry);
+
+/**
+ * Displays past journal entries from localStorage.
+ */
+function displayPastEntries() {
+    pastEntriesList.innerHTML = '';
+    const entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+
+    if (entries.length === 0) {
+        pastEntriesList.innerHTML = '<p>You have no saved entries yet.</p>';
+        return;
+    }
+
+    entries.forEach(entry => {
+        const entryElement = document.createElement('div');
+        entryElement.classList.add('past-entry');
+
+        const entryDate = new Date(entry.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        entryElement.innerHTML = `
+            <div class="past-entry-date">${entryDate}</div>
+            <div class="past-entry-concept">${entry.concept}</div>
+            <p class="past-entry-text">${entry.text}</p>
+        `;
+        pastEntriesList.appendChild(entryElement);
+    });
+}
+
+// Event listener for the "View Past Entries" button
+viewEntriesBtn.addEventListener('click', () => {
+    displayPastEntries();
+    pastEntriesContainer.classList.remove('hidden');
+});
+
+// Event listener for the "Close" button in the past entries view
+closeEntriesBtn.addEventListener('click', () => {
+    pastEntriesContainer.classList.add('hidden');
+});
+
+// Event listeners for the flip buttons
+flipToBackButton.addEventListener('click', flipCard);
+flipToFrontButton.addEventListener('click', flipCard);
+
+// Adjust card height on window resize, with a debounce for performance
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(setCardHeight, 200); // Debounce to avoid excessive calls
+});
+
+// Initial height setting after DOM is loaded and content is populated
+// A small delay helps ensure all fonts/content are rendered before measurement
+setTimeout(setCardHeight, 100);

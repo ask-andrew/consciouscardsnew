@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Transparency Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .image-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .image-box.dark {
+            background: #333;
+            color: white;
+        }
+        .image-box img {
+            max-width: 200px;
+            max-height: 200px;
+            display: block;
+            margin: 0 auto 10px;
+        }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9f7fe;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Transparency Test</h1>
+    
+    <div class="info">
+        <h3>Transparency Check</h3>
+        <p>If the images have proper transparency, you should see the background color through them.</p>
+        <p>If you see white squares around the images, they don't have proper transparency.</p>
+    </div>
+
+    <h2>Light Background</h2>
+    <div class="image-container">
+        <div class="image-box">
+            <h3>Joyful.png</h3>
+            <img src="images/Joyful.png" alt="Joyful">
+            <p>Original</p>
+        </div>
+        <div class="image-box">
+            <h3>1.png</h3>
+            <img src="images/1.png" alt="Image 1">
+            <p>Original</p>
+        </div>
+        <div class="image-box">
+            <h3>2.png</h3>
+            <img src="images/2.png" alt="Image 2">
+            <p>Original</p>
+        </div>
+    </div>
+
+    <h2>Dark Background</h2>
+    <div class="image-container">
+        <div class="image-box dark">
+            <h3>Joyful.png</h3>
+            <img src="images/Joyful.png" alt="Joyful">
+            <p>Original</p>
+        </div>
+        <div class="image-box dark">
+            <h3>1.png</h3>
+            <img src="images/1.png" alt="Image 1">
+            <p>Original</p>
+        </div>
+        <div class="image-box dark">
+            <h3>2.png</h3>
+            <img src="images/2.png" alt="Image 2">
+            <p>Original</p>
+        </div>
+    </div>
+
+    <div class="info">
+        <h3>Next Steps</h3>
+        <p>Based on what you see, we can determine if the images need to be processed to add proper transparency.</p>
+        <p>If you see white squares around the images, we'll need to process them to remove the white background.</p>
+    </div>
+</body>
+</html>

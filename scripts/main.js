@@ -41,7 +41,7 @@ class ConsciousCards {
 
   async loadCards() {
     try {
-      const response = await fetch('conscious_cards_expanded2.json');
+      const response = await fetch('./conscious_cards_expanded2.json');
       if (!response.ok) throw new Error('Failed to load cards');
       
       this.cards = await response.json();
